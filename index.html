@@ -3,9 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache">  
+<meta http-equiv="Cache-Control" content="no-cache">
 <title>Feedlot CH4 Emissions -- Diurnal Patterns</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <style>
@@ -219,7 +224,7 @@ footer {
     </div>
     <div class="sum-item">
       <div class="sum-label">Overall median</div>
-      <div class="sum-val">209 g/head/day d</div>
+      <div class="sum-val">209 g/head/day</div>
     </div>
     <div class="sum-item">
       <div class="sum-label">Dominant peak hour</div>
@@ -317,13 +322,16 @@ function peakHour(vals) {
   vals.forEach((v,i)=>{ if(v!==null&&v>mx){mx=v;idx=i;} });
   return idx;
 }
-
 const INSIGHTS = {
-  all:    `<strong>Evening peak is consistent across most months.</strong> The 19:00 hour is the highest or near-highest emission window in summer and fall months, consistent with crepuscular cattle activity at dusk. August 2025 shows the highest median peak at 602 g/head/day. Winter months (Dec-Feb) show flatter profiles, likely reflecting shorter days and shifted feeding behaviour. July 2025 is an outlier, with an unusual secondary peak at 21:00-22:00.`,
-  season: `<strong>Seasonal shape is distinct.</strong> Summer and Fall produce a well-defined evening ramp peaking at 19:00-20:00 LST. Spring follows a similar but shallower pattern. Winter is the most irregular season, data coverage at night is thinner and daylight-driven feeding cues are weaker in Alberta at that latitude. All four seasons still converge on the 18:00-20:00 window as the dominant emission period.`,
-  year:   `<strong>Emissions in 2025 are consistently higher than 2024</strong> across virtually all hours of the day. Both years share the same 19:00 peak structure, ruling out a measurement-time artefact. The elevated 2025 baseline (especially Aug-Sep) likely reflects differences in ration energy density, animal live weight at the time of measurement, or herd composition rather than a change in method.`
-  Crepuscular behavior: `<strong>Cattle exhibit crepuscular behavior, meaning they are most active during the twilight hours of dawn and dusk. Their primary grazing and feeding events peak right around sunrise and sunset to maximize energy intake while avoiding the midday heat and nighttime predators.`
+  all: `<strong>Evening peak is consistent across most months.</strong> The 19:00 hour is the highest or near-highest emission window in summer and fall months, consistent with crepuscular cattle activity at dusk. August 2025 shows the highest median peak at 602 g/head/day. Winter months show flatter profiles. July 2025 is an outlier, with an unusual secondary peak at 21:00–22:00.`,
+
+  season: `<strong>Seasonal shape is distinct.</strong> Summer and Fall produce a well-defined evening ramp peaking at 19:00–20:00 LST. Spring follows a similar but shallower pattern. Winter is the most irregular season. All four seasons still converge on the 18:00–20:00 window as the dominant emission period.`,
+
+  year: `<strong>Emissions in 2025 are consistently higher than 2024.</strong> Both years share the same 19:00 peak structure, suggesting this is not just a measurement-time artefact.`,
+
+  crepuscular: `<strong>Cattle exhibit crepuscular behavior.</strong> This means activity often increases around dawn and dusk.`
 };
+
 
 function render() {
   const view = document.getElementById('viewSel').value;
