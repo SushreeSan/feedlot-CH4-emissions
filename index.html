@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Feedlot CH4 Emissions — Diurnal Patterns</title>
+<title>Feedlot CH4 Emissions -- Diurnal Patterns</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -20,7 +20,7 @@ body {
 
 .page { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 5rem; }
 
-/* ── Header ── */
+/* -- Header -- */
 .header-rule { width: 36px; height: 3px; background: #2563b0; margin-bottom: 1.25rem; }
 
 h1 {
@@ -48,7 +48,7 @@ h1 {
   padding-top: 1rem;
 }
 
-/* ── Summary row ── */
+/* -- Summary row -- */
 .summary-row {
   display: flex;
   gap: 0;
@@ -67,7 +67,7 @@ h1 {
 .sum-val { font-size: 1.25rem; font-weight: 600; color: #111; }
 .sum-val.blue { color: #2563b0; }
 
-/* ── Controls ── */
+/* -- Controls -- */
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -112,7 +112,7 @@ select:focus { border-color: #2563b0; }
 .toggle-wrap.on .toggle-track { background: #2563b0; }
 .toggle-wrap.on .toggle-track::after { transform: translateX(16px); }
 
-/* ── Chart area ── */
+/* -- Chart area -- */
 .chart-section { margin-bottom: 1.75rem; }
 
 .chart-header {
@@ -141,7 +141,7 @@ select:focus { border-color: #2563b0; }
 }
 .chart-wrap { position: relative; width: 100%; height: 340px; }
 
-/* ── Legend ── */
+/* -- Legend -- */
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -153,7 +153,7 @@ select:focus { border-color: #2563b0; }
 .leg-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #555; }
 .leg-swatch { width: 18px; height: 2.5px; border-radius: 2px; flex-shrink: 0; }
 
-/* ── Insight ── */
+/* -- Insight -- */
 .insight {
   border-left: 3px solid #2563b0;
   padding: 0.65rem 1rem;
@@ -165,7 +165,7 @@ select:focus { border-color: #2563b0; }
 }
 .insight strong { color: #111; font-weight: 600; }
 
-/* ── Methods note ── */
+/* -- Methods note -- */
 .methods {
   font-size: 12.5px;
   color: #888;
@@ -176,7 +176,7 @@ select:focus { border-color: #2563b0; }
 }
 .methods strong { color: #555; }
 
-/* ── Footer ── */
+/* -- Footer -- */
 footer {
   border-top: 1px solid #e5e5e5;
   padding-top: 1rem;
@@ -201,10 +201,10 @@ footer {
 
   <div class="header-rule"></div>
   <h1>Diurnal Patterns of CH4 Emissions<br>from an Alberta Beef Feedlot</h1>
-  <p class="byline">OPL-Windtrax inverse dispersion measurements · August 2024 - November 2025</p>
+  <p class="byline">OPL-Windtrax inverse dispersion measurements - August 2024 - November 2025</p>
 
   <p class="intro">
-    Median methane emission rates (g head-1 day-1) by hour of day, derived from 15-minute averaged open-path laser concentration measurements and backward Lagrangian stochastic dispersion modelling. Data shown are from the quality-filtered dataset (u* ≥ 0.05 m s-1, |L| > 2 m, CI < 90, Frac > 0.04).
+    Median methane emission rates (g/head/day) by hour of day, derived from 15-minute averaged open-path laser concentration measurements and backward Lagrangian stochastic dispersion modelling. Data shown are from the quality-filtered dataset (u* >= 0.05 m/s, |L| > 2 m, CI < 90, Frac > 0.04).
   </p>
 
   <div class="summary-row">
@@ -218,11 +218,11 @@ footer {
     </div>
     <div class="sum-item">
       <div class="sum-label">Overall median</div>
-      <div class="sum-val">209 g hd-1 d-1</div>
+      <div class="sum-val">209 g/head/day d</div>
     </div>
     <div class="sum-item">
       <div class="sum-label">Dominant peak hour</div>
-      <div class="sum-val blue">19:00 LST</div>
+      <div class="sum-val blue">19:00 MT</div>
     </div>
   </div>
 
@@ -243,7 +243,7 @@ footer {
 
   <div class="chart-section">
     <div class="chart-header">
-      <span class="chart-label" id="chartLabel">All months — median g CH4 head-1 day-1 </span>
+      <span class="chart-label" id="chartLabel">All months -- median g CH4/head/day</span>
       <span class="peak-tag" id="peakTag">Peak at 19:00 in most months</span>
     </div>
     <div class="chart-box">
@@ -261,8 +261,8 @@ footer {
   </div>
 
   <footer>
-    <span>SushreeSan · feedlot-CH4-emissions · GitHub Pages</span>
-    <span>Data: OPL-Windtrax, Alberta, Canada · Chart.js 4.4.1</span>
+    <span>SushreeSan - feedlot-CH4-emissions - GitHub Pages</span>
+    <span>Data: OPL-Windtrax, Alberta, Canada - Chart.js 4.4.1</span>
   </footer>
 
 </div>
@@ -274,7 +274,7 @@ const MONTHS = Object.keys(DATA);
 const HOURS  = Array.from({length:24},(_,i)=>i);
 const HLABELS = HOURS.map(h => h===0?'12 am': h<12?`${h} am`: h===12?'12 pm':`${h-12} pm`);
 
-// Muted, varied palette — not neon
+// Muted, varied palette -- not neon
 const PALETTE = [
   '#2563b0','#c0392b','#16a34a','#d97706','#7c3aed',
   '#0e7490','#be185d','#4d7c0f','#b45309','#1d4ed8',
@@ -318,9 +318,9 @@ function peakHour(vals) {
 }
 
 const INSIGHTS = {
-  all:    `<strong>Evening peak is consistent across most months.</strong> The 19:00 hour is the highest or near-highest emission window in summer and fall months, consistent with crepuscular cattle activity at dusk. August 2025 shows the highest median peak at 602 g head⁻¹ day⁻¹. Winter months (Dec–Feb) show flatter profiles, likely reflecting shorter days and shifted feeding behaviour. July 2025 is an outlier, with an unusual secondary peak at 21:00–22:00.`,
-  season: `<strong>Seasonal shape is distinct.</strong> Summer and Fall produce a well-defined evening ramp peaking at 19:00–20:00 LST. Spring follows a similar but shallower pattern. Winter is the most irregular season — data coverage at night is thinner and daylight-driven feeding cues are weaker in Alberta at that latitude. All four seasons still converge on the 18:00–20:00 window as the dominant emission period.`,
-  year:   `<strong>Emissions in 2025 are consistently higher than 2024</strong> across virtually all hours of the day. Both years share the same 19:00 peak structure, ruling out a measurement-time artefact. The elevated 2025 baseline (especially Aug–Sep) likely reflects differences in ration energy density, animal live weight at the time of measurement, or herd composition rather than a change in method.`
+  all:    `<strong>Evening peak is consistent across most months.</strong> The 19:00 hour is the highest or near-highest emission window in summer and fall months, consistent with crepuscular cattle activity at dusk. August 2025 shows the highest median peak at 602 g/head/day. Winter months (Dec-Feb) show flatter profiles, likely reflecting shorter days and shifted feeding behaviour. July 2025 is an outlier, with an unusual secondary peak at 21:00-22:00.`,
+  season: `<strong>Seasonal shape is distinct.</strong> Summer and Fall produce a well-defined evening ramp peaking at 19:00-20:00 LST. Spring follows a similar but shallower pattern. Winter is the most irregular season, data coverage at night is thinner and daylight-driven feeding cues are weaker in Alberta at that latitude. All four seasons still converge on the 18:00-20:00 window as the dominant emission period.`,
+  year:   `<strong>Emissions in 2025 are consistently higher than 2024</strong> across virtually all hours of the day. Both years share the same 19:00 peak structure, ruling out a measurement-time artefact. The elevated 2025 baseline (especially Aug-Sep) likely reflects differences in ration energy density, animal live weight at the time of measurement, or herd composition rather than a change in method.`
 };
 
 function render() {
@@ -344,7 +344,7 @@ function render() {
     });
     const peakers = MONTHS.filter(m => peakHour(HOURS.map(h=>DATA[m][h]!==undefined?DATA[m][h]:null))===19);
     peakLabel  = `Peak at 19:00 in ${peakers.length} of ${MONTHS.length} months`;
-    chartLabel = 'All months — median g CH₄ head⁻¹ day⁻¹';
+    chartLabel = 'All months -- median g CH4/head/day';
 
   } else if(view==='season') {
     const seasons = ['Winter','Spring','Summer','Fall'];
@@ -360,10 +360,10 @@ function render() {
         tension: 0.3, pointRadius: 3, pointHoverRadius: 6,
         fill: false, borderWidth: 2, spanGaps: false
       });
-      legendItems.push({label: `${s} — peak ${HLABELS[ph]}`, color: sCols[s]});
+      legendItems.push({label: `${s} -- peak ${HLABELS[ph]}`, color: sCols[s]});
     });
     peakLabel  = 'Average of monthly medians by season';
-    chartLabel = 'Seasonal averages — g CH₄ head⁻¹ day⁻¹';
+    chartLabel = 'Seasonal averages -- g CH4/head/day';
 
   } else {
     const yCols = {'2024':'#2563b0','2025':'#c0392b'};
@@ -377,10 +377,10 @@ function render() {
         tension: 0.3, pointRadius: 3, pointHoverRadius: 6,
         fill: true, borderWidth: 2, spanGaps: false
       });
-      legendItems.push({label: `${y} — peak ${HLABELS[ph]}`, color: yCols[y]});
+      legendItems.push({label: `${y} -- peak ${HLABELS[ph]}`, color: yCols[y]});
     });
     peakLabel  = '2024 vs 2025 annual comparison';
-    chartLabel = '2024 vs 2025 — average of monthly medians';
+    chartLabel = '2024 vs 2025 -- average of monthly medians';
   }
 
   document.getElementById('peakTag').textContent   = peakLabel;
@@ -428,7 +428,7 @@ function render() {
           bodyFont:  {family:"'Source Sans 3',sans-serif", size:12},
           padding: 10,
           callbacks: {
-            label: ctx => `  ${ctx.dataset.label}: ${ctx.parsed.y!==null ? Math.round(ctx.parsed.y)+' g hd⁻¹ d⁻¹' : '—'}`
+            label: ctx => `  ${ctx.dataset.label}: ${ctx.parsed.y!==null ? Math.round(ctx.parsed.y)+' g/head/day' : '--'}`
           }
         }
       },
@@ -439,7 +439,7 @@ function render() {
           border:{color:'#ddd'}
         },
         y: {
-          title: {display:true, text:'g CH₄ head⁻¹ day⁻¹ (median)', color:'#888', font:{size:11}},
+          title: {display:true, text:'g CH4/head/day (median)', color:'#888', font:{size:11}},
           ticks: {color:tickCol},
           grid:  {color:gridCol},
           border:{color:'#ddd'},
