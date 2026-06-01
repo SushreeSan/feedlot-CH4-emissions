@@ -5,303 +5,264 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Feedlot CH₄ Emissions — Diurnal Patterns</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg: #0e1117;
-    --bg2: #161b24;
-    --bg3: #1e2533;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.14);
-    --text: #e8eaf0;
-    --text2: #8892a4;
-    --text3: #555f72;
-    --accent: #4ade9a;
-    --accent2: #f97316;
-    --accent3: #60a5fa;
-    --font-mono: 'Space Mono', monospace;
-    --font-body: 'DM Sans', sans-serif;
-  }
+body {
+  background: #fff;
+  color: #1a1a1a;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 15px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
+.page { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 5rem; }
 
-  /* subtle grid bg */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(74,222,154,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(74,222,154,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
+/* ── Header ── */
+.header-rule { width: 36px; height: 3px; background: #2563b0; margin-bottom: 1.25rem; }
 
-  .wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+h1 {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.85rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #111;
+  margin-bottom: 0.5rem;
+}
 
-  /* Header */
-  header { margin-bottom: 2.5rem; }
-  .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-  }
-  h1 {
-    font-size: clamp(1.5rem, 4vw, 2.4rem);
-    font-weight: 600;
-    line-height: 1.2;
-    color: var(--text);
-    margin-bottom: 0.5rem;
-  }
-  h1 span { color: var(--accent); }
-  .subtitle {
-    font-size: 14px;
-    color: var(--text2);
-    max-width: 600px;
-  }
+.byline {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 0.35rem;
+}
 
-  /* Stats row */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 2rem;
-  }
-  .stat {
-    background: var(--bg2);
-    padding: 1rem 1.25rem;
-  }
-  .stat-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 4px;
-  }
-  .stat-val {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--text);
-    font-family: var(--font-mono);
-  }
-  .stat-val.green { color: var(--accent); }
-  .stat-val.orange { color: var(--accent2); }
-  .stat-val.blue { color: var(--accent3); }
+.intro {
+  font-size: 14.5px;
+  color: #444;
+  max-width: 640px;
+  margin-top: 0.75rem;
+  margin-bottom: 2rem;
+  border-top: 1px solid #e5e5e5;
+  padding-top: 1rem;
+}
 
-  /* Controls */
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: flex-end;
-    margin-bottom: 1.5rem;
-  }
-  .ctrl-group { display: flex; flex-direction: column; gap: 5px; }
-  .ctrl-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-  select, .toggle-btn {
-    background: var(--bg2);
-    border: 1px solid var(--border2);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 13px;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  select:hover, .toggle-btn:hover { border-color: var(--accent); }
-  select option { background: var(--bg2); }
+/* ── Summary row ── */
+.summary-row {
+  display: flex;
+  gap: 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.sum-item {
+  flex: 1;
+  padding: 0.85rem 1.1rem;
+  border-right: 1px solid #ddd;
+}
+.sum-item:last-child { border-right: none; }
+.sum-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 2px; }
+.sum-val { font-size: 1.25rem; font-weight: 600; color: #111; }
+.sum-val.blue { color: #2563b0; }
 
-  .toggle-btn {
-    display: flex; align-items: center; gap: 8px;
-    user-select: none;
-  }
-  .toggle-btn .pip {
-    width: 32px; height: 17px;
-    background: var(--bg3);
-    border-radius: 99px;
-    position: relative;
-    transition: background 0.2s;
-    flex-shrink: 0;
-  }
-  .toggle-btn .pip::after {
-    content: '';
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 11px; height: 11px;
-    border-radius: 50%;
-    background: var(--text3);
-    transition: transform 0.2s, background 0.2s;
-  }
-  .toggle-btn.on .pip { background: rgba(74,222,154,0.25); }
-  .toggle-btn.on .pip::after { transform: translateX(15px); background: var(--accent); }
+/* ── Controls ── */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.ctrl-group { display: flex; align-items: center; gap: 8px; }
+.ctrl-group label { font-size: 13px; color: #555; }
 
-  /* Chart card */
-  .chart-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .chart-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .chart-title {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .peak-badge {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    padding: 3px 10px;
-    border-radius: 99px;
-    background: rgba(74,222,154,0.12);
-    color: var(--accent);
-    border: 1px solid rgba(74,222,154,0.25);
-  }
-  .chart-wrap { position: relative; width: 100%; height: 360px; }
+select {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 13px;
+  color: #222;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 5px 10px;
+  cursor: pointer;
+  outline: none;
+}
+select:focus { border-color: #2563b0; }
 
-  /* Legend */
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-  }
-  .leg-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--text2);
-  }
-  .leg-swatch {
-    width: 20px;
-    height: 3px;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
+.toggle-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555; cursor: pointer; user-select: none; }
+.toggle-track {
+  width: 34px; height: 18px;
+  background: #ccc;
+  border-radius: 99px;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+}
+.toggle-wrap.on .toggle-track { background: #2563b0; }
+.toggle-wrap.on .toggle-track::after { transform: translateX(16px); }
 
-  /* Insight box */
-  .insight {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 8px 8px 0;
-    padding: 1rem 1.25rem;
-    font-size: 13px;
-    color: var(--text2);
-    line-height: 1.7;
-    margin-bottom: 2rem;
-  }
-  .insight strong { color: var(--text); font-weight: 500; }
+/* ── Chart area ── */
+.chart-section { margin-bottom: 1.75rem; }
 
-  /* Footer */
-  footer {
-    border-top: 1px solid var(--border);
-    padding-top: 1.5rem;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text3);
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chart-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.06em; }
+.peak-tag {
+  font-size: 12px;
+  color: #2563b0;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 3px;
+  padding: 2px 8px;
+}
 
-  @media (max-width: 600px) {
-    .chart-wrap { height: 280px; }
-  }
+.chart-box {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1.25rem 1.25rem 0.75rem;
+  background: #fafafa;
+}
+.chart-wrap { position: relative; width: 100%; height: 340px; }
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e8e8e8;
+}
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #555; }
+.leg-swatch { width: 18px; height: 2.5px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── Insight ── */
+.insight {
+  border-left: 3px solid #2563b0;
+  padding: 0.65rem 1rem;
+  background: #f8faff;
+  font-size: 13.5px;
+  color: #444;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+.insight strong { color: #111; font-weight: 600; }
+
+/* ── Methods note ── */
+.methods {
+  font-size: 12.5px;
+  color: #888;
+  line-height: 1.7;
+  border-top: 1px solid #e5e5e5;
+  padding-top: 1.25rem;
+  margin-bottom: 2rem;
+}
+.methods strong { color: #555; }
+
+/* ── Footer ── */
+footer {
+  border-top: 1px solid #e5e5e5;
+  padding-top: 1rem;
+  font-size: 11.5px;
+  color: #aaa;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+@media (max-width: 620px) {
+  h1 { font-size: 1.4rem; }
+  .summary-row { flex-wrap: wrap; }
+  .sum-item { flex: 1 1 45%; border-bottom: 1px solid #ddd; }
+  .chart-wrap { height: 260px; }
+}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="page">
 
-  <header>
-    <p class="eyebrow">OPL-Windtrax · Alberta Feedlot · Aug 2024 – Nov 2025</p>
-    <h1>Feedlot <span>CH₄</span> Emissions<br>Diurnal Patterns</h1>
-    <p class="subtitle">Median methane emission rates (g/head/day) by hour of day across 17 months of inverse dispersion measurements.</p>
-  </header>
+  <div class="header-rule"></div>
+  <h1>Diurnal Patterns of CH₄ Emissions<br>from an Alberta Beef Feedlot</h1>
+  <p class="byline">OPL-Windtrax inverse dispersion measurements · August 2024 – November 2025</p>
 
-  <div class="stats">
-    <div class="stat"><div class="stat-label">Measurement periods</div><div class="stat-val green">9,939</div></div>
-    <div class="stat"><div class="stat-label">Months covered</div><div class="stat-val blue">17</div></div>
-    <div class="stat"><div class="stat-label">Overall median (g/hd/day)</div><div class="stat-val">209</div></div>
-    <div class="stat"><div class="stat-label">Peak hour (most months)</div><div class="stat-val orange">19:00</div></div>
-    <div class="stat"><div class="stat-label">Max monthly median</div><div class="stat-val orange">602</div></div>
+  <p class="intro">
+    Median methane emission rates (g head⁻¹ day⁻¹) by hour of day, derived from 15-minute averaged open-path laser concentration measurements and backward Lagrangian stochastic dispersion modelling. Data shown are from the quality-filtered dataset (u* ≥ 0.05 m s⁻¹, |L| > 2 m, CI < 90, Frac > 0.04).
+  </p>
+
+  <div class="summary-row">
+    <div class="sum-item">
+      <div class="sum-label">Filtered records</div>
+      <div class="sum-val">9,939</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-label">Months</div>
+      <div class="sum-val">17</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-label">Overall median</div>
+      <div class="sum-val">209 g hd⁻¹ d⁻¹</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-label">Dominant peak hour</div>
+      <div class="sum-val blue">19:00 LST</div>
+    </div>
   </div>
 
   <div class="controls">
     <div class="ctrl-group">
-      <span class="ctrl-label">View mode</span>
+      <label for="viewSel">Display:</label>
       <select id="viewSel" onchange="render()">
-        <option value="all">All months (overlaid)</option>
-        <option value="season">By season</option>
+        <option value="all">All months overlaid</option>
+        <option value="season">Seasonal averages</option>
         <option value="year">2024 vs 2025</option>
       </select>
     </div>
-    <div class="ctrl-group">
-      <span class="ctrl-label">7 pm marker</span>
-      <div class="toggle-btn on" id="peakToggle" onclick="togglePeak()">
-        <div class="pip"></div>
-        <span>Show</span>
-      </div>
+    <div class="toggle-wrap on" id="peakToggle" onclick="togglePeak()">
+      <div class="toggle-track"></div>
+      <span>Show 19:00 marker</span>
     </div>
   </div>
 
-  <div class="chart-card">
-    <div class="chart-title-row">
-      <span class="chart-title" id="chartTitle">All months — median g CH₄ / head / day</span>
-      <span class="peak-badge" id="peakBadge">Peak: 19:00 in most months</span>
+  <div class="chart-section">
+    <div class="chart-header">
+      <span class="chart-label" id="chartLabel">All months — median g CH₄ head⁻¹ day⁻¹</span>
+      <span class="peak-tag" id="peakTag">Peak at 19:00 in most months</span>
     </div>
-    <div class="chart-wrap">
-      <canvas id="mainChart" role="img" aria-label="Diurnal CH4 emission pattern by hour of day"></canvas>
+    <div class="chart-box">
+      <div class="chart-wrap">
+        <canvas id="mainChart" role="img" aria-label="Diurnal CH4 emission rates by hour of day"></canvas>
+      </div>
+      <div class="legend" id="legendWrap"></div>
     </div>
-    <div class="legend" id="legendWrap"></div>
   </div>
 
   <div class="insight" id="insightBox"></div>
 
+  <div class="methods">
+    <strong>Methods note.</strong> Concentrations measured with open-path tunable diode lasers (OPL). Emission rates calculated using the WindTrax backward Lagrangian stochastic model. Each point represents the median of all quality-passing 15-min estimates within that hour across the month. Gaps indicate hours with no valid estimates after filtering. Jul 2024 and Nov–Dec 2025 have limited hour coverage due to campaign timing.
+  </div>
+
   <footer>
-    <span>OPL-Windtrax inverse dispersion · Filtered dataset · Alberta, Canada</span>
-    <span>Built with Chart.js · Data: Aug 2024 – Nov 2025</span>
+    <span>SushreeSan · feedlot-CH4-emissions · GitHub Pages</span>
+    <span>Data: OPL-Windtrax, Alberta, Canada · Chart.js 4.4.1</span>
   </footer>
 
 </div>
@@ -310,10 +271,16 @@
 const DATA = {"Jul 2024":{"8":258.4,"9":242.7,"10":228.7,"11":212.1,"12":259.8,"13":352.9,"14":188.9,"15":123.4,"16":107.0,"17":13.7,"18":208.4,"19":522.8,"20":144.7},"Aug 2024":{"0":215.0,"1":215.2,"2":185.5,"3":200.9,"4":177.9,"5":164.2,"6":162.4,"7":170.1,"8":215.2,"9":234.2,"10":234.7,"11":224.2,"12":252.1,"13":249.5,"14":252.7,"15":245.6,"16":234.0,"17":254.8,"18":295.4,"19":322.0,"20":372.6,"21":280.8,"22":244.7,"23":240.7},"Sep 2024":{"1":154.3,"2":167.7,"3":145.6,"4":129.4,"5":125.8,"6":125.8,"7":112.7,"8":165.7,"9":232.4,"10":259.7,"11":246.3,"12":195.6,"13":171.4,"14":182.6,"15":148.5,"16":96.5,"17":175.6,"18":278.1,"19":248.1,"20":247.6,"21":239.2,"22":222.3,"23":199.3},"Oct 2024":{"0":194.0,"1":188.4,"2":187.0,"3":179.0,"4":163.1,"5":156.8,"6":141.8,"7":153.2,"8":183.1,"9":224.6,"10":250.6,"11":228.6,"12":202.8,"13":214.3,"14":252.0,"15":234.0,"16":251.8,"17":271.5,"18":274.4,"19":293.8,"20":255.4,"21":235.2,"22":210.4,"23":204.5},"Nov 2024":{"0":144.7,"1":123.4,"2":125.8,"3":79.6,"5":99.0,"7":104.5,"8":183.0,"9":158.8,"10":211.4,"11":263.0,"12":227.2,"13":233.2,"14":235.5,"15":272.8,"16":263.3,"17":294.5,"18":284.1,"19":277.5,"20":233.9,"21":207.1,"22":210.2,"23":200.5},"Dec 2024":{"12":229.7,"13":196.0,"14":224.0,"15":241.8,"16":253.2,"19":256.7,"20":238.4,"21":227.1,"22":198.1,"23":216.2},"Jan 2025":{"10":201.7,"11":248.8,"12":263.8,"13":247.0,"14":225.6,"15":212.2,"16":248.1,"17":274.1,"18":297.9,"19":245.5,"20":217.2,"21":215.2},"Feb 2025":{"0":111.9,"1":64.9,"2":64.6,"3":107.3,"4":60.2,"5":62.7,"6":79.5,"7":36.9,"8":242.3,"9":89.2,"10":116.2,"11":120.6,"12":147.3,"13":173.8,"14":191.1,"15":220.1,"16":178.0,"17":161.1,"18":154.8,"19":181.5,"20":143.6,"21":86.9,"22":82.8},"Mar 2025":{"0":119.1,"1":117.0,"2":112.0,"3":110.0,"4":93.1,"5":90.2,"6":84.0,"7":81.0,"8":124.7,"9":133.6,"10":144.6,"11":150.6,"12":138.8,"13":120.4,"14":131.5,"15":133.2,"16":148.6,"17":159.1,"18":168.4,"19":182.6,"20":181.1,"21":156.3,"22":141.8,"23":125.2},"Apr 2025":{"0":126.9,"1":124.4,"2":107.8,"3":102.2,"4":91.5,"5":80.3,"6":80.0,"7":124.4,"8":150.1,"9":143.5,"10":154.5,"11":134.5,"12":142.7,"13":139.3,"14":140.5,"15":144.4,"16":156.3,"17":160.3,"18":163.7,"19":202.5,"20":187.0,"21":165.8,"22":152.8,"23":143.2},"May 2025":{"0":139.5,"1":131.6,"2":118.2,"3":106.5,"4":92.0,"5":89.7,"6":118.0,"7":159.2,"8":165.6,"9":151.4,"10":155.6,"11":146.0,"12":142.0,"13":150.4,"14":152.5,"15":158.4,"16":172.3,"17":175.2,"18":207.6,"19":227.9,"20":220.3,"21":205.5,"22":167.6,"23":170.8},"Jun 2025":{"0":178.2,"1":164.5,"2":147.8,"3":136.3,"4":126.7,"5":127.8,"6":146.0,"7":161.9,"8":175.7,"9":206.4,"10":162.5,"11":189.8,"12":195.3,"13":198.8,"14":189.8,"15":199.6,"16":200.8,"17":214.5,"18":235.5,"19":297.3,"20":275.0,"21":265.5,"22":226.8,"23":227.7},"Jul 2025":{"0":260.5,"1":226.2,"2":168.7,"3":180.1,"4":181.5,"5":164.5,"6":189.5,"7":227.3,"8":281.7,"9":291.4,"10":264.7,"11":275.2,"12":239.9,"13":249.0,"14":251.4,"15":233.3,"16":252.6,"17":262.7,"18":258.0,"19":266.4,"20":278.5,"21":368.9,"22":311.7,"23":278.7},"Aug 2025":{"0":279.7,"1":258.0,"2":242.0,"3":209.1,"4":218.2,"5":236.5,"6":190.5,"7":213.2,"8":209.3,"9":229.0,"10":244.3,"11":267.9,"12":294.6,"13":328.0,"14":343.7,"15":334.9,"16":368.8,"17":358.2,"18":470.9,"19":601.5,"20":441.4,"21":361.7,"22":344.4,"23":328.8},"Sep 2025":{"0":246.0,"1":220.0,"2":173.6,"3":183.6,"4":168.2,"5":155.2,"6":182.3,"7":186.0,"8":167.9,"9":192.4,"10":177.6,"11":182.3,"12":191.4,"13":197.1,"14":203.3,"15":214.5,"16":241.2,"17":267.1,"18":338.6,"19":356.5,"20":310.2,"21":245.1,"22":224.1,"23":225.2},"Oct 2025":{"0":133.1,"1":289.8,"2":168.0,"3":95.3,"4":167.6,"5":114.0,"6":162.0,"7":238.0,"8":196.9,"9":227.6,"10":176.4,"11":231.7,"12":210.0,"13":222.2,"14":177.3,"15":215.6,"16":269.4,"17":348.9,"18":179.4,"21":170.3,"23":168.7},"Nov 2025":{"11":200.1,"12":105.9,"13":94.0,"14":186.3,"15":249.0,"16":542.3,"23":102.1}};
 
 const MONTHS = Object.keys(DATA);
-const HOURS = Array.from({length:24},(_,i)=>i);
-const HLABELS = HOURS.map(h=>h===0?'12am':h<12?`${h}am`:h===12?'12pm':`${h-12}pm`);
+const HOURS  = Array.from({length:24},(_,i)=>i);
+const HLABELS = HOURS.map(h => h===0?'12 am': h<12?`${h} am`: h===12?'12 pm':`${h-12} pm`);
 
-const PALETTE = ['#4ade9a','#60a5fa','#f97316','#a78bfa','#34d399','#fb923c','#818cf8','#2dd4bf','#f472b6','#facc15','#38bdf8','#c084fc','#86efac','#fda4af','#67e8f9','#fcd34d','#a5b4fc'];
+// Muted, varied palette — not neon
+const PALETTE = [
+  '#2563b0','#c0392b','#16a34a','#d97706','#7c3aed',
+  '#0e7490','#be185d','#4d7c0f','#b45309','#1d4ed8',
+  '#065f46','#92400e','#6d28d9','#0f766e','#9f1239',
+  '#1e40af','#78350f'
+];
 
 const seasonOf = label => {
   const mo = new Date(`${label} 1`).getMonth()+1;
@@ -328,9 +295,9 @@ let chart = null;
 
 function togglePeak() {
   showPeak = !showPeak;
-  const btn = document.getElementById('peakToggle');
-  btn.classList.toggle('on', showPeak);
-  btn.querySelector('span').textContent = showPeak ? 'Show' : 'Hide';
+  const el = document.getElementById('peakToggle');
+  el.classList.toggle('on', showPeak);
+  el.querySelector('span').textContent = showPeak ? 'Show 19:00 marker' : 'Hide 19:00 marker';
   render();
 }
 
@@ -341,118 +308,146 @@ function avgHourly(monthList) {
     const d=DATA[m];
     HOURS.forEach(h=>{ if(d[h]!==undefined){sums[h]+=d[h];counts[h]++;} });
   });
-  return HOURS.map(h=>counts[h]>0?Math.round(sums[h]/counts[h]*10)/10:null);
+  return HOURS.map(h => counts[h]>0 ? Math.round(sums[h]/counts[h]*10)/10 : null);
 }
 
 function peakHour(vals) {
   let mx=-Infinity, idx=null;
-  vals.forEach((v,i)=>{if(v!==null&&v>mx){mx=v;idx=i;}});
+  vals.forEach((v,i)=>{ if(v!==null&&v>mx){mx=v;idx=i;} });
   return idx;
 }
 
 const INSIGHTS = {
-  all: `<strong>Evening peak confirmed in most months:</strong> The 7 pm (19:00) hour ranks as the highest or near-highest emission window in summer and fall months. Winter and spring show a shallower, broader profile. Aug 2025 is the highest-emission month with a median peak of 602 g/head/day at 19:00. Jul 2025 is an outlier with an unusual late-night spike at 21:00–22:00.`,
-  season: `<strong>Seasonal shape differences are clear:</strong> Summer and Fall show a sharp evening ramp peaking at 19:00–20:00 — consistent with crepuscular (dusk) cattle feeding behaviour. Spring has a weaker, later peak (~19:00–20:00). Winter is the most irregular, likely due to reduced daylight shifting cattle activity and thinner overnight data coverage.`,
-  year: `<strong>2025 emissions are substantially higher than 2024</strong> across almost all hours. The evening peak is present in both years at 19:00, but 2025 shows a much steeper ramp from 16:00 onward. This may reflect differences in ration composition, animal weight, or herd size rather than a methodological shift.`
+  all:    `<strong>Evening peak is consistent across most months.</strong> The 19:00 hour is the highest or near-highest emission window in summer and fall months, consistent with crepuscular cattle activity at dusk. August 2025 shows the highest median peak at 602 g head⁻¹ day⁻¹. Winter months (Dec–Feb) show flatter profiles, likely reflecting shorter days and shifted feeding behaviour. July 2025 is an outlier, with an unusual secondary peak at 21:00–22:00.`,
+  season: `<strong>Seasonal shape is distinct.</strong> Summer and Fall produce a well-defined evening ramp peaking at 19:00–20:00 LST. Spring follows a similar but shallower pattern. Winter is the most irregular season — data coverage at night is thinner and daylight-driven feeding cues are weaker in Alberta at that latitude. All four seasons still converge on the 18:00–20:00 window as the dominant emission period.`,
+  year:   `<strong>Emissions in 2025 are consistently higher than 2024</strong> across virtually all hours of the day. Both years share the same 19:00 peak structure, ruling out a measurement-time artefact. The elevated 2025 baseline (especially Aug–Sep) likely reflects differences in ration energy density, animal live weight at the time of measurement, or herd composition rather than a change in method.`
 };
 
 function render() {
   const view = document.getElementById('viewSel').value;
-  const isDark = true;
-  const grid = 'rgba(255,255,255,0.06)';
-  const txt = '#8892a4';
+  const gridCol  = 'rgba(0,0,0,0.06)';
+  const tickCol  = '#999';
 
-  let datasets=[], legendItems=[], peakLabel='';
+  let datasets=[], legendItems=[], peakLabel='', chartLabel='';
 
   if(view==='all') {
     MONTHS.forEach((m,i)=>{
-      const vals=HOURS.map(h=>DATA[m][h]!==undefined?DATA[m][h]:null);
-      const col=PALETTE[i%PALETTE.length];
-      datasets.push({label:m,data:vals,borderColor:col,backgroundColor:col+'18',tension:0.35,pointRadius:1.5,pointHoverRadius:5,spanGaps:false,fill:false,borderWidth:1.5});
-      legendItems.push({label:m,color:col});
+      const vals = HOURS.map(h => DATA[m][h]!==undefined ? DATA[m][h] : null);
+      const col  = PALETTE[i % PALETTE.length];
+      datasets.push({
+        label: m, data: vals,
+        borderColor: col, backgroundColor: col+'18',
+        tension: 0.3, pointRadius: 1.5, pointHoverRadius: 5,
+        spanGaps: false, fill: false, borderWidth: 1.5
+      });
+      legendItems.push({label: m, color: col});
     });
-    const peakers=MONTHS.filter(m=>peakHour(HOURS.map(h=>DATA[m][h]!==undefined?DATA[m][h]:null))===19);
-    peakLabel=`Peak at 19:00 in ${peakers.length}/${MONTHS.length} months`;
-    document.getElementById('chartTitle').textContent='All months — median g CH₄ / head / day';
+    const peakers = MONTHS.filter(m => peakHour(HOURS.map(h=>DATA[m][h]!==undefined?DATA[m][h]:null))===19);
+    peakLabel  = `Peak at 19:00 in ${peakers.length} of ${MONTHS.length} months`;
+    chartLabel = 'All months — median g CH₄ head⁻¹ day⁻¹';
+
   } else if(view==='season') {
-    const seasons=['Winter','Spring','Summer','Fall'];
-    const sColors={Winter:'#60a5fa',Spring:'#4ade9a',Summer:'#f97316',Fall:'#facc15'};
+    const seasons = ['Winter','Spring','Summer','Fall'];
+    const sCols   = {Winter:'#2563b0', Spring:'#16a34a', Summer:'#c0392b', Fall:'#d97706'};
     seasons.forEach(s=>{
-      const mths=MONTHS.filter(m=>seasonOf(m)===s);
+      const mths = MONTHS.filter(m => seasonOf(m)===s);
       if(!mths.length) return;
-      const vals=avgHourly(mths);
-      const ph=peakHour(vals);
-      datasets.push({label:`${s} (n=${mths.length})`,data:vals,borderColor:sColors[s],backgroundColor:sColors[s]+'22',tension:0.35,pointRadius:3,pointHoverRadius:6,fill:false,borderWidth:2.5,spanGaps:false});
-      legendItems.push({label:`${s} — peak ${HLABELS[ph]}`,color:sColors[s]});
+      const vals = avgHourly(mths);
+      const ph   = peakHour(vals);
+      datasets.push({
+        label: `${s} (n = ${mths.length} months)`, data: vals,
+        borderColor: sCols[s], backgroundColor: sCols[s]+'18',
+        tension: 0.3, pointRadius: 3, pointHoverRadius: 6,
+        fill: false, borderWidth: 2, spanGaps: false
+      });
+      legendItems.push({label: `${s} — peak ${HLABELS[ph]}`, color: sCols[s]});
     });
-    peakLabel='Seasonal average profiles';
-    document.getElementById('chartTitle').textContent='By season — average of monthly medians';
+    peakLabel  = 'Average of monthly medians by season';
+    chartLabel = 'Seasonal averages — g CH₄ head⁻¹ day⁻¹';
+
   } else {
-    const yColors={'2024':'#60a5fa','2025':'#f97316'};
+    const yCols = {'2024':'#2563b0','2025':'#c0392b'};
     ['2024','2025'].forEach(y=>{
-      const mths=MONTHS.filter(m=>m.includes(y));
-      const vals=avgHourly(mths);
-      const ph=peakHour(vals);
-      datasets.push({label:`${y} (${mths.length} months)`,data:vals,borderColor:yColors[y],backgroundColor:yColors[y]+'22',tension:0.35,pointRadius:3,pointHoverRadius:6,fill:true,borderWidth:2.5,spanGaps:false});
-      legendItems.push({label:`${y} — peak ${HLABELS[ph]}`,color:yColors[y]});
+      const mths = MONTHS.filter(m=>m.includes(y));
+      const vals = avgHourly(mths);
+      const ph   = peakHour(vals);
+      datasets.push({
+        label: `${y} (${mths.length} months)`, data: vals,
+        borderColor: yCols[y], backgroundColor: yCols[y]+'14',
+        tension: 0.3, pointRadius: 3, pointHoverRadius: 6,
+        fill: true, borderWidth: 2, spanGaps: false
+      });
+      legendItems.push({label: `${y} — peak ${HLABELS[ph]}`, color: yCols[y]});
     });
-    peakLabel='Year-over-year comparison';
-    document.getElementById('chartTitle').textContent='2024 vs 2025 — average of monthly medians';
+    peakLabel  = '2024 vs 2025 annual comparison';
+    chartLabel = '2024 vs 2025 — average of monthly medians';
   }
 
-  document.getElementById('peakBadge').textContent=peakLabel;
-  document.getElementById('insightBox').innerHTML=INSIGHTS[view];
+  document.getElementById('peakTag').textContent   = peakLabel;
+  document.getElementById('chartLabel').textContent = chartLabel;
+  document.getElementById('insightBox').innerHTML   = INSIGHTS[view];
 
-  const lw=document.getElementById('legendWrap');
-  lw.innerHTML=legendItems.map(l=>`<span class="leg-item"><span class="leg-swatch" style="background:${l.color}"></span>${l.label}</span>`).join('');
+  document.getElementById('legendWrap').innerHTML = legendItems.map(l =>
+    `<span class="leg-item"><span class="leg-swatch" style="background:${l.color}"></span>${l.label}</span>`
+  ).join('');
 
-  const peakPlugin={
-    id:'peakLine',
-    afterDraw(ch){
+  const peakPlugin = {
+    id: 'peakLine',
+    afterDraw(ch) {
       if(!showPeak) return;
-      const {ctx,chartArea,scales}=ch;
-      const x=scales.x.getPixelForValue(19);
+      const {ctx, chartArea, scales} = ch;
+      const x = scales.x.getPixelForValue(19);
       ctx.save();
-      ctx.strokeStyle='rgba(74,222,154,0.4)';
-      ctx.lineWidth=1.5;
-      ctx.setLineDash([5,4]);
-      ctx.beginPath(); ctx.moveTo(x,chartArea.top); ctx.lineTo(x,chartArea.bottom); ctx.stroke();
-      ctx.fillStyle='rgba(74,222,154,0.9)';
-      ctx.font='10px "Space Mono", monospace';
-      ctx.fillText('7 pm',x+5,chartArea.top+14);
+      ctx.strokeStyle = 'rgba(37,99,176,0.35)';
+      ctx.lineWidth   = 1;
+      ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke();
+      ctx.fillStyle = '#2563b0';
+      ctx.font = '11px "Source Sans 3", sans-serif';
+      ctx.fillText('19:00', x+4, chartArea.top+13);
       ctx.restore();
     }
   };
 
   if(chart) chart.destroy();
-  chart=new Chart(document.getElementById('mainChart'),{
-    type:'line',
-    data:{labels:HLABELS,datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'rgba(14,17,23,0.95)',
-          borderColor:'rgba(255,255,255,0.1)',
-          borderWidth:1,
-          titleFont:{family:"'Space Mono',monospace",size:11},
-          bodyFont:{family:"'DM Sans',sans-serif",size:12},
-          callbacks:{label:ctx=>`  ${ctx.dataset.label}: ${ctx.parsed.y!==null?Math.round(ctx.parsed.y)+' g/hd/day':'–'}`}
+  chart = new Chart(document.getElementById('mainChart'), {
+    type: 'line',
+    data: {labels: HLABELS, datasets},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: {mode:'index', intersect:false},
+      plugins: {
+        legend: {display: false},
+        tooltip: {
+          backgroundColor: '#fff',
+          borderColor: '#ddd',
+          borderWidth: 1,
+          titleColor: '#333',
+          bodyColor: '#555',
+          titleFont: {family:"'Source Sans 3',sans-serif", size:12, weight:'600'},
+          bodyFont:  {family:"'Source Sans 3',sans-serif", size:12},
+          padding: 10,
+          callbacks: {
+            label: ctx => `  ${ctx.dataset.label}: ${ctx.parsed.y!==null ? Math.round(ctx.parsed.y)+' g hd⁻¹ d⁻¹' : '—'}`
+          }
         }
       },
-      scales:{
-        x:{ticks:{color:txt,font:{size:11},maxRotation:45},grid:{color:grid},border:{color:'rgba(255,255,255,0.05)'}},
-        y:{
-          title:{display:true,text:'g CH₄ / head / day (median)',color:txt,font:{size:11}},
-          ticks:{color:txt},grid:{color:grid},
-          border:{color:'rgba(255,255,255,0.05)'},
-          min:0
+      scales: {
+        x: {
+          ticks: {color:tickCol, font:{size:11}, maxRotation:45, autoSkip:true, maxTicksLimit:12},
+          grid:  {color:gridCol},
+          border:{color:'#ddd'}
+        },
+        y: {
+          title: {display:true, text:'g CH₄ head⁻¹ day⁻¹ (median)', color:'#888', font:{size:11}},
+          ticks: {color:tickCol},
+          grid:  {color:gridCol},
+          border:{color:'#ddd'},
+          min: 0
         }
       }
     },
-    plugins:[peakPlugin]
+    plugins: [peakPlugin]
   });
 }
 
